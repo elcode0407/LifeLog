@@ -22,13 +22,14 @@ import auth, { database } from "../../firebase/firebase";
 import InputComp from "../../components/Auth/Input";
 import { addNote, addNoteToCategory, updateSum } from "../../redux/logs";
 import { Alert } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-export default function AddNote({ navigation }) {
+export default function AddNote({ navigation, route }) {
   const categories = useSelector(
     (state) => state.lifeLog.database.userCategories
   );
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
+  const [value1, setValue] = useState(null);
   const [value2, setValue2] = useState(null);
 
   const dispatch = useDispatch();
@@ -75,20 +76,36 @@ export default function AddNote({ navigation }) {
     }
   };
 
-  const submitContentHandle = () => {
+  const submitContentHandle = async () => {
     const replaceHTML = descHTML.replace(/<(.|\n)*?>/g, "").trim();
     const replaceWhiteSpace = replaceHTML.replace(/&nbsp;/g, "").trim();
+    let value = null;
     if (replaceWhiteSpace.length <= 0) {
       setShowDescError(true);
       Alert.alert("Note must not be empty");
       return;
     } else {
       const cName = name > 15 || name <= 0;
-      if (cName || value === null) {
+      if (!!route.params?.initialCategory) {
+        if (cName) {
+          setIsInvalid(true);
+          Alert.alert("Title or Category must not be empty");
+          return;
+        } else {
+          console.log(route.params.initialCategoryId);
+          value = {
+            category: route.params?.initialCategory,
+            category_id: route.params?.initialCategoryId,
+          };
+        }
+      } else if (!!value1) {
+        value = value1;
+      } else if (cName || value === null) {
         setIsInvalid(true);
         Alert.alert("Title or Category must not be empty");
         return;
       }
+      console.log(value);
       console.log(categories[value.category_id].notesNum);
 
       const sum = categories[value.category_id].notesNum + 1;
@@ -152,7 +169,9 @@ export default function AddNote({ navigation }) {
       set(newCategoryRef, newCategoryData)
         .then(() => {
           console.log("Note успешно добавлена в базу данных.");
-          navigation.navigate("HomeScreen");
+          !!route.params?.initialCategory
+            ? navigation.goBack()
+            : navigation.navigate("HomeScreen");
         })
         .catch((error) => {
           console.error("Ошибка при добавлении заметки: ", error);
@@ -205,7 +224,11 @@ export default function AddNote({ navigation }) {
                   value={name}
                 />
                 <DropDownPicker
-                  placeholder="Select Color of Category"
+                  placeholder={
+                    !!route.params?.initialCategory
+                      ? route.params?.initialCategory
+                      : "Select Category"
+                  }
                   open={open}
                   value={value2}
                   setValue={setValue2}

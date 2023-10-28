@@ -58,6 +58,12 @@ const deviceSlice = createSlice({
         action.payload.idN
       ];
     },
+    removeNote: (state, action) => {
+      delete state.database.userNotes[action.payload.id];
+    },
+    removeCategory: (state, action) => {
+      delete state.database.userCategories[action.payload.id];
+    },
   },
 });
 
@@ -68,7 +74,8 @@ export const addNote = deviceSlice.actions.addNote;
 export const updateSum = deviceSlice.actions.updateSum;
 export const addNoteToCategory = deviceSlice.actions.addNoteToCategory;
 export const removeNoteToCategory = deviceSlice.actions.removeNoteToCategory;
-
+export const removeNote = deviceSlice.actions.removeNote;
+export const removeCategory = deviceSlice.actions.removeCategory;
 export const authenticated = deviceSlice.actions.authenticated;
 export const logout = deviceSlice.actions.logout;
 export const setData = deviceSlice.actions.setData;

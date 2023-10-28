@@ -4,7 +4,7 @@ import { FAB } from "react-native-paper";
 import auth, { database } from "../../firebase/firebase";
 import { Database, push, ref, set } from "firebase/database";
 
-export default function AddFABButton() {
+export default function AddFABButton({ category, category_id }) {
   const navigation = useNavigation();
 
   return (
@@ -13,7 +13,12 @@ export default function AddFABButton() {
       style={styles.fab}
       customSize={60}
       icon="plus"
-      onPress={() => navigation.navigate("AddNote")}
+      onPress={() =>
+        navigation.navigate("AddNote", {
+          initialCategory: category,
+          initialCategoryId: category_id,
+        })
+      }
     />
   );
 }

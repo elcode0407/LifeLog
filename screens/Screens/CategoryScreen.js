@@ -2,10 +2,12 @@ import { FlatList, Text, View, StyleSheet } from "react-native";
 import AddFABButton from "../../components/ui/AddFABButton";
 import { useSelector } from "react-redux";
 import Category from "../../components/Category";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-export default function CategoryScreen() {
+export default function CategoryScreen({ navigation }) {
   const data = useSelector((state) => state.lifeLog.database?.userCategories);
   console.log(data);
+
   function renderItem({ item }) {
     return <Category item={item} />;
   }
