@@ -142,6 +142,7 @@ export default function AddNote({ navigation, route }) {
         detailsHtml: descHTML,
         header: name,
         user_id: auth.currentUser.uid,
+        favorite: 0,
       };
 
       // update sum

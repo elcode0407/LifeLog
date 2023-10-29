@@ -64,6 +64,18 @@ const deviceSlice = createSlice({
     removeCategory: (state, action) => {
       delete state.database.userCategories[action.payload.id];
     },
+    updateFavorite: (state, action) => {
+      state.database.userNotes[action.payload.id].favorite = action.payload.num;
+    },
+    addFavorite: (state, action) => {
+      if (!state.database.userFavorites) {
+        state.database.userFavorites = {};
+      }
+      state.database.userFavorites[action.payload.id] = action.payload.idValue;
+    },
+    removeFavorite: (state, action) => {
+      delete state.database.userFavorites[action.payload.id];
+    },
   },
 });
 
@@ -75,6 +87,9 @@ export const updateSum = deviceSlice.actions.updateSum;
 export const addNoteToCategory = deviceSlice.actions.addNoteToCategory;
 export const removeNoteToCategory = deviceSlice.actions.removeNoteToCategory;
 export const removeNote = deviceSlice.actions.removeNote;
+export const updateFavorite = deviceSlice.actions.updateFavorite;
+export const addFavorite = deviceSlice.actions.addFavorite;
+export const removeFavorite = deviceSlice.actions.removeFavorite;
 export const removeCategory = deviceSlice.actions.removeCategory;
 export const authenticated = deviceSlice.actions.authenticated;
 export const logout = deviceSlice.actions.logout;

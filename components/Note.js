@@ -1,15 +1,58 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { ref, remove, set } from "firebase/database";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import auth, { database } from "../firebase/firebase";
+import { addFavorite, removeFavorite, updateFavorite } from "../redux/logs";
 
 export default function Note({ item }) {
   const [pressed, setPressed] = useState(false);
   const data = useSelector(
-    (state) => state.lifeLog.database.userCategories[item.category_id]
+    (state) => state.lifeLog.database?.userCategories[item.category_id]
   );
+  const num = useSelector(
+    (state) => state.lifeLog.database?.userNotes[item.id]?.favorite
+  );
+  const dispatch = useDispatch();
   const navigation = useNavigation();
+  function addToFavorite() {
+    if (num === 0) {
+      dispatch(addFavorite({ id: item.id, idValue: item.id }));
+      set(
+        ref(
+          database,
+          `favorites/${auth.currentUser.uid}/userFavorites/${item.id}`
+        ),
+        item.id
+      );
+      dispatch(updateFavorite({ id: item.id, num: 1 }));
+      set(
+        ref(
+          database,
+          `notes/${auth.currentUser.uid}/userNotes/${item.id}/favorite`
+        ),
+        1
+      );
+    } else {
+      dispatch(removeFavorite({ id: item.id }));
+      remove(
+        ref(
+          database,
+          `favorites/${auth.currentUser.uid}/userFavorites/${item.id}`
+        )
+      );
+      dispatch(updateFavorite({ id: item.id, num: 0 }));
+      set(
+        ref(
+          database,
+          `notes/${auth.currentUser.uid}/userNotes/${item.id}/favorite`
+        ),
+        0
+      );
+    }
+  }
   return (
     <Pressable
       onLongPress={() =>
@@ -25,6 +68,12 @@ export default function Note({ item }) {
       <View>
         <View style={styles.header}>
           <Text style={styles.headerText}>{item.header}</Text>
+          <MaterialIcons
+            name={item.favorite === 0 ? "favorite-outline" : "favorite"}
+            size={24}
+            color="black"
+            onPress={addToFavorite}
+          />
         </View>
         {pressed && (
           <View style={styles.details}>
@@ -46,6 +95,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginTop: 10,
     width: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   footerText: {
     fontSize: 17,

@@ -235,6 +235,8 @@ function Root() {
         const dbUser = ref(database, `${uid}/`);
         const dbNotes = ref(database, `notes/${uid}/`);
         const dbCategories = ref(database, `categories/${uid}/`);
+        const dbFavorites = ref(database, `favorites/${uid}/`);
+
         onValue(
           dbUser,
           (snapshot) => {
@@ -256,8 +258,21 @@ function Root() {
                     console.log(data);
                     console.log(snapshot.val());
                     dispatch(setData({ data: snapshot.val() }));
-                    dispatch(authenticated({ token: user.uid }));
-                    setIsAuthenticated(true);
+                    onValue(
+                      dbFavorites,
+                      (snapshot) => {
+                        console.log(3);
+                        console.log(snapshot.val());
+                        dispatch(setData({ data: snapshot.val() }));
+                        console.log(Object.values(data));
+
+                        dispatch(authenticated({ token: user.uid }));
+                        setIsAuthenticated(true);
+                      },
+                      {
+                        onlyOnce: true,
+                      }
+                    );
                   },
                   {
                     onlyOnce: true,
